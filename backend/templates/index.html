@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<head>
+</head>
+
+<body>
+    <script src="//code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+
+    <h1>Welecome to CPU TEMP</h1>
+    <p id="cpu_temp"></p>
+
+    <button onclick="update()">Update</button>
+
+<script>
+
+    var socket = undefined;
+
+    $(document).ready(function(){
+    
+
+        namespace = '/ws_cpu_temp';
+        socket = io.connect(namespace);
+
+        update()
+    });
+
+    function update(){
+        socket.on('cpu temperature',function(msg){
+            document.getElementById('cpu_temp').innerHTML = msg.data
+            console.log(msg.data)
+        });
+    }
+
+</script>
+
+</body>

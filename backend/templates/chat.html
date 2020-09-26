@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<head>
+</head>
+
+<body>
+    <h1>Hello World</h1>
+
+    <script src="//code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+
+    <form id="form1">
+        <label for="input_text">Input Message:</label>
+        <input id="input_text" name="message" type="text"/>
+    </form>
+
+    <textarea id="output" row="50" cols="1" style="min-width: 400px; min-height: 200px;">
+
+    </textarea>
+
+    <button onclick="submit_form_broadcast()">Send broadcast</button>
+    <button onclick="submit_form()">Send</button>
+
+<script>
+
+    var socket = undefined;
+
+    $(document).ready(function(){
+    
+        var output = $('#output')
+
+        namespace = '/test';
+        socket = io.connect(namespace);
+
+        socket.on('my response',function(msg){
+            output.append(msg.data + '\n')
+        });
+    });
+
+    function submit_form(){
+
+        var form = $('#form1')
+        message = form.serializeArray()[0]['value']
+        socket.emit('my event', {data: message});
+
+    };
+
+    function submit_form_broadcast(){
+
+        var form = $('#form1')
+        message = form.serializeArray()[0]['value']
+        socket.emit('my broadcast event', {data: message});
+
+        };
+
+</script>
+
+</body>

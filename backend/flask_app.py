@@ -1,15 +1,75 @@
-from flask import Flask
+from flask import Flask,render_template
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'J$eEV§0uzGzjRxTC$DM2LKy!'
+
+#websocket
+from flask_socketio import SocketIO, emit
+socketio = SocketIO(app,cors_allowed_origins='*')
+
+#import logger
+from utils import *
+logger_name = 'flask_views'
+init_logger(loglevel='DEBUG',filename='flask_views.log',logger_name=logger_name)
+import logging
+logger = logging.getLogger(logger_name)
 
 #import sensor
 from sensor import get_cpu_temperature
 
-@app.route('/')
-def hello_world():
-    return "Hello World"
+#import CPU Thread from thread.py
+from thread import CpuTempThread
 
-
+#HTTP Way
 @app.route('/cpu_temp')
 def cpu_temp():
-    temp = format(get_cpu_temperature(), '.2f')
-    return 'CPU Temperature: {}°C'.format(temp)
+    return 'CPU Temperature: {}°C'.format(get_cpu_temperature())
+
+#Websocket Way
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+from time import sleep
+@socketio.on('connect', namespace='/ws_cpu_temp')
+def test_connect():
+    logger.debug("Connected with socket.io")
+    thread = CpuTempThread(socketio=socketio,namespace='/ws_cpu_temp')
+    thread.start()
+
+    
+@socketio.on('disconnect', namespace='/ws_cpu_temp')
+def test_disconnect():
+    logger.debug("Client disconnected")
+
+
+@app.route('/chat')
+def chat():
+    return render_template('chat.html')
+
+@socketio.on('connect', namespace='/test')
+def test_connect():
+    logger.debug("Connected with socket.io")
+    emit('my reponse', {'data': 'Connected'})
+
+@socketio.on('disconnect', namespace='/test')
+def test_disconnect():
+    logger.debug("Client disconnected")
+
+@socketio.on('my event', namespace='/test')
+def test_message(message):
+    emit('my response', {'data': message['data']})
+
+@socketio.on('my broadcast event', namespace='/test')
+def test_message_broadcast(message):
+    emit('my response', {'data': message['data']}, broadcast=True)
+
+if __name__ == "__main__":
+
+    import eventlet,threading
+    eventlet.monkey_patch()
+
+    # Start the server
+    webapp_thread = threading.Thread(target=socketio.run(app))
+    webapp_thread.start()
+
+    

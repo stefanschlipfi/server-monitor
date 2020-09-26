@@ -6,11 +6,11 @@ def load_conf():
 
     return json_obj
 
-def init_logger(loglevel = 'INFO',stream = False,filename='outdoor-kitchen.log'):
+def init_logger(loglevel = 'INFO',stream = False,filename='outdoor-kitchen.log',logger_name = 'outdoor-kitchen'):
     loglevel = logging.getLevelName(loglevel.upper())
     if not isinstance(loglevel,int):
         raise TypeError("unknown Logging" + str(loglevel))
-    logger = logging.getLogger('outdoor-kitchen')
+    logger = logging.getLogger(logger_name)
     logger.setLevel(loglevel)
 
     stream_formatter = logging.Formatter('%(levelname)s - %(message)s')
@@ -28,3 +28,5 @@ def init_logger(loglevel = 'INFO',stream = False,filename='outdoor-kitchen.log')
         handlers.append(ch)
 
     logger.handlers = handlers
+
+

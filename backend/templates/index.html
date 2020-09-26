@@ -9,8 +9,6 @@
     <h1>Welecome to CPU TEMP</h1>
     <p id="cpu_temp"></p>
 
-    <button onclick="update()">Update</button>
-
 <script>
 
     var socket = undefined;
@@ -21,15 +19,11 @@
         namespace = '/ws_cpu_temp';
         socket = io.connect(namespace);
 
-        update()
-    });
-
-    function update(){
         socket.on('cpu temperature',function(msg){
-            document.getElementById('cpu_temp').innerHTML = msg.data
-            console.log(msg.data)
+            message = 'CPU Temperature: ' + msg.data + '°C'
+            document.getElementById('cpu_temp').innerHTML = message
         });
-    }
+    });
 
 </script>
 

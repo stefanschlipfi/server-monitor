@@ -1,3 +1,4 @@
 {
-    "cpu_label": "k10temp"
+    "cpu_label": "k10temp",
+    "ssd_label": "nvme"
 }

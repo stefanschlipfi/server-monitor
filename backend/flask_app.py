@@ -64,12 +64,6 @@ def test_message_broadcast(message):
     emit('my response', {'data': message['data']}, broadcast=True)
 
 if __name__ == "__main__":
-
-    import eventlet,threading
-    eventlet.monkey_patch()
-
-    # Start the server
-    webapp_thread = threading.Thread(target=socketio.run(app))
-    webapp_thread.start()
+    socketio.run(app)
 
     

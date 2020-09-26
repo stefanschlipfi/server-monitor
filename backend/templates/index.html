@@ -1,13 +1,33 @@
 <!DOCTYPE html>
 <head>
+    <!-- CSS only -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
     <script src="//code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <!-- JS, Popper.js, and jQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
 
-    <h1>Welecome to CPU TEMP</h1>
-    <p id="cpu_temp"></p>
+
+    <div class="container">
+        <h1>Welecome to PC TEMP Viewer</h1>
+
+        <div class="progress">
+            <div id="cpu_temp_progress" class="progress-bar" role="progressbar"aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <p id="cpu_temp"></p>
+
+        <div class="progress">
+            <div id="ssd_temp_progress" class="progress-bar" role="progressbar"aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <p id="ssd_temp"></p>
+
+
+    </div>
 
 <script>
 
@@ -15,14 +35,56 @@
 
     $(document).ready(function(){
     
+        var colors = {'good':'bg-success','warning':'bg-warning','danger':'bg-danger'};
 
         namespace = '/ws_cpu_temp';
         socket = io.connect(namespace);
+        var cpu_p = $('#cpu_temp_progress');
+        var ssd_p = $('#ssd_temp_progress');
 
         socket.on('cpu temperature',function(msg){
-            message = 'CPU Temperature: ' + msg.data + '°C'
+            
+            function remove_bg(obj){
+                for (const [key,value] of Object.entries(colors)){
+                    obj.removeClass(value);
+                }
+            }
+
+            temp = msg.data
+            message = 'CPU Temperature: ' + temp + '°C'
             document.getElementById('cpu_temp').innerHTML = message
+            cpu_p.css('width',temp +'%')
+
+            remove_bg(cpu_p)
+            if (temp < 50)
+                cpu_p.addClass(colors['good'])
+            else if (temp > 50 && temp < 55)
+                cpu_p.addClass(colors['warning'])
+            else
+                cpu_p.addClass(colors['danger'])
         });
+        socket.on('ssd temperature',function(msg){
+            
+            function remove_bg(obj){
+                for (const [key,value] of Object.entries(colors)){
+                    obj.removeClass(value);
+                }
+            }
+
+            temp = msg.data
+            message = 'SSD Temperature: ' + temp + '°C'
+            document.getElementById('ssd_temp').innerHTML = message
+            ssd_p.css('width',temp +'%')
+
+            remove_bg(ssd_p)
+            if (temp < 50)
+                ssd_p.addClass(colors['good'])
+            else if (temp > 50 && temp < 55)
+                ssd_p.addClass(colors['warning'])
+            else
+                ssd_p.addClass(colors['danger'])
+        });
+
     });
 
 </script>

@@ -1,0 +1,6 @@
+{
+    "sensors":{
+        "cpu": "k10temp",
+        "ssd": "nvme"
+    }
+}

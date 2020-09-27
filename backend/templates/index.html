@@ -14,18 +14,11 @@
 
 
     <div class="container">
-        <h1>Welecome to PC TEMP Viewer</h1>
+        <h1>Welecome to Server TEMP Viewer</h1>
 
-        <div class="progress">
-            <div id="cpu_temp_progress" class="progress-bar" role="progressbar"aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+        <div id="server-temperature-div">
+            <!-- dynamic created by js -->
         </div>
-        <p id="cpu_temp"></p>
-
-        <div class="progress">
-            <div id="ssd_temp_progress" class="progress-bar" role="progressbar"aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-        <p id="ssd_temp"></p>
-
 
     </div>
 
@@ -39,52 +32,40 @@
 
         namespace = '/ws_cpu_temp';
         socket = io.connect(namespace);
-        var cpu_p = $('#cpu_temp_progress');
-        var ssd_p = $('#ssd_temp_progress');
+        var server = $('#server-temperature-div')
 
-        socket.on('cpu temperature',function(msg){
-            
-            function remove_bg(obj){
-                for (const [key,value] of Object.entries(colors)){
-                    obj.removeClass(value);
-                }
-            }
+        socket.on('server temperature',function(msg){
 
-            temp = msg.data
-            message = 'CPU Temperature: ' + temp + '°C'
-            document.getElementById('cpu_temp').innerHTML = message
-            cpu_p.css('width',temp +'%')
+            server.empty()
+            for (const[device,props] of Object.entries(msg)){
 
-            remove_bg(cpu_p)
-            if (temp < 50)
-                cpu_p.addClass(colors['good'])
-            else if (temp > 50 && temp < 55)
-                cpu_p.addClass(colors['warning'])
-            else
-                cpu_p.addClass(colors['danger'])
+                progress_bar = $('<div/>')
+                progress_bar.addClass('progress')
+                
+                label = $('<h5/>')
+                label.text(device + ' Temperature: ' + props.temperature + '°C')
+
+                progress_item = $('<div/>')
+                progress_item.addClass('progress-bar')
+                progress_item.attr('rule','progressbar')
+                progress_item.attr('aria-valuemin','0')
+                progress_item.attr('aria-valuemax','100')
+                progress_item.innerHTML = props.temperature
+                progress_item.css('width',props.temperature +'%')
+
+                if (props.temperature < 50)
+                    progress_item.addClass(colors['good'])
+                else if (props.temperature > 50 && props.temperature < 55)
+                    progress_item.addClass(colors['warning'])
+                else
+                    progress_item.addClass(colors['danger'])
+
+                progress_bar.append(progress_item)
+                server.append(label)
+                server.append(progress_bar)
+            };
         });
-        socket.on('ssd temperature',function(msg){
-            
-            function remove_bg(obj){
-                for (const [key,value] of Object.entries(colors)){
-                    obj.removeClass(value);
-                }
-            }
-
-            temp = msg.data
-            message = 'SSD Temperature: ' + temp + '°C'
-            document.getElementById('ssd_temp').innerHTML = message
-            ssd_p.css('width',temp +'%')
-
-            remove_bg(ssd_p)
-            if (temp < 50)
-                ssd_p.addClass(colors['good'])
-            else if (temp > 50 && temp < 55)
-                ssd_p.addClass(colors['warning'])
-            else
-                ssd_p.addClass(colors['danger'])
-        });
-
+       
     });
 
 </script>

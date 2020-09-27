@@ -13,30 +13,20 @@ init_logger(loglevel='DEBUG',filename='flask_views.log',logger_name=logger_name)
 import logging
 logger = logging.getLogger(logger_name)
 
-#import sensor
-from sensor import get_cpu_temperature
-
 #import CPU Thread from thread.py
-from thread import CpuTempThread
-
-#HTTP Way
-@app.route('/cpu_temp')
-def cpu_temp():
-    return 'CPU Temperature: {}°C'.format(get_cpu_temperature())
+from thread import TempThread
 
 #Websocket Way
 @app.route('/')
 def index():
     return render_template('index.html')
 
-from time import sleep
 @socketio.on('connect', namespace='/ws_cpu_temp')
 def test_connect():
     logger.debug("Connected with socket.io")
-    thread = CpuTempThread(socketio=socketio,namespace='/ws_cpu_temp')
+    thread = TempThread(socketio=socketio,namespace='/ws_cpu_temp')
     thread.start()
 
-    
 @socketio.on('disconnect', namespace='/ws_cpu_temp')
 def test_disconnect():
     logger.debug("Client disconnected")

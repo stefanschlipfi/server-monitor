@@ -18,7 +18,7 @@ class TempThread(Thread):
         """
         Get temperature from sensor.py
         """
-        logging.info("Entered infinity loop, delay: {}".format(self.delay))
+        logger.info("Entered infinity loop, delay: {}".format(self.delay))
         while True:
             
             temp_dict = get_temperature()

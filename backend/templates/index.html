@@ -36,7 +36,7 @@
         var server = $('#server-temperature-div')
 
         socket.on('server temperature',function(msg){
-
+            
             server.empty()
             for (const[device,props] of Object.entries(msg)){
 

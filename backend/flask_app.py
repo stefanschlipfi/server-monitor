@@ -4,7 +4,7 @@ app.config['SECRET_KEY'] = 'J$eEV§0uzGzjRxTC$DM2LKy!'
 
 #websocket
 from flask_socketio import SocketIO, emit
-socketio = SocketIO(app,cors_allowed_origins='*')
+socketio = SocketIO(app,cors_allowed_origins='*',async_mode="threading")
 
 #import logger
 from utils import *
@@ -54,6 +54,10 @@ def test_message_broadcast(message):
     emit('my response', {'data': message['data']}, broadcast=True)
 
 if __name__ == "__main__":
+   
+    import eventlet
+    eventlet.monkey_patch()
+
     socketio.run(app)
 
     
